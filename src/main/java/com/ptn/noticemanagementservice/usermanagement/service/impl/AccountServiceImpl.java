@@ -1,5 +1,6 @@
 package com.ptn.noticemanagementservice.usermanagement.service.impl;
 
+import com.ptn.noticemanagementservice.common.exception.ResourceNotFoundException;
 import com.ptn.noticemanagementservice.usermanagement.dto.AccountDto;
 import com.ptn.noticemanagementservice.usermanagement.entity.Account;
 import com.ptn.noticemanagementservice.usermanagement.repository.AccountRepository;
@@ -49,5 +50,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public boolean existsByUsernameOrEmail(String username, String email) {
         return accountRepository.existsByUsernameOrEmail(username, email);
+    }
+
+    @Override
+    public Account getByUserName(String username) throws ResourceNotFoundException {
+        return accountRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("Account", "username", username));
     }
 }

@@ -1,13 +1,12 @@
 package com.ptn.noticemanagementservice.noticemanagement.request;
 
-import com.ptn.noticemanagementservice.common.entity.BaseEntity;
-import com.ptn.noticemanagementservice.noticemanagement.entity.Document;
-import com.ptn.noticemanagementservice.usermanagement.entity.Account;
-import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.validator.constraints.Length;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,13 +14,21 @@ import java.util.List;
 @EqualsAndHashCode
 public class NoticeRequest {
 
+    private Long id;
+
     private Date startDate;
 
     private Date endDate;
 
-    private String noticeStatus;
-
+    @NotBlank(message = "Title is required")
+    @Length(max = 255)
     private String title;
 
+    @NotBlank(message = "Content is required")
+    @Length
     private String contentDetail;
+
+    @Valid
+    private List<DocumentRequest> documentRequests;
+
 }

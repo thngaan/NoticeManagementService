@@ -12,15 +12,14 @@ import java.util.List;
 
 @Entity(name = "Notice")
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class Notice  extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "AuthorId", referencedColumnName = "Id", nullable = false)
     private Account account;
 
-    @OneToMany(mappedBy = "Notice", targetEntity = Document.class, fetch = FetchType.LAZY)
-    @Transient
+    @OneToMany(mappedBy = "notice", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Document> documents = new ArrayList<>();
 
     @Column(name = "StartDate")
@@ -42,4 +41,7 @@ public class Notice  extends BaseEntity {
 
     @Column(name = "IsDeleted")
     private boolean isDeleted;
+
+    @Column(name = "ViewCounter")
+    private int viewCounter;
 }

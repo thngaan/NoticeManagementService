@@ -2,6 +2,7 @@ package com.ptn.noticemanagementservice.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -21,5 +22,10 @@ public class ApplicationConfiguration {
         builder.indentOutput(false);
         builder.serializationInclusion(JsonInclude.Include.NON_NULL);
         return builder.build();
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 }

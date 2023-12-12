@@ -7,14 +7,14 @@ import lombok.EqualsAndHashCode;
 
 @Entity(name = "Document")
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class Document  extends BaseEntity {
 
     @Column(name = "ContentType")
     private String contentType;
 
     @Column(name = "FileSize")
-    private long fileSize;
+    private Long fileSize;
 
     @Column(name = "FileName")
     private String fileName;
@@ -24,15 +24,10 @@ public class Document  extends BaseEntity {
     @Column(name = "FileContent")
     private byte[] fileContent;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "Thumbnail")
-    private byte[] thumbnail;
-
-    @Column(name = "Order")
-    private int order;
+    @Column(name = "OrderNo")
+    private Integer order;
 
     @ManyToOne
-    @JoinColumn(name = "NoticeId", referencedColumnName = "Id")
+    @JoinColumn(name = "NoticeId")
     private Notice notice;
 }
