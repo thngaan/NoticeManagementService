@@ -36,15 +36,15 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDto register(RegistrationRequest registrationDto) {
-            Account account = new Account();
-            account.setAccountStatus("ACTIVE");
-            account.setEmail(registrationDto.getEmail());
-            account.setPhoneNumber(registrationDto.getPhoneNumber());
-            account.setUsername(registrationDto.getUsername());
-            account.setFullName(registrationDto.getFullName());
-            account.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
-            accountRepository.save(account);
-            return new AccountDto(account.getUsername());
+        Account account = new Account();
+        account.setAccountStatus("ACTIVE");
+        account.setEmail(registrationDto.getEmail());
+        account.setPhoneNumber(registrationDto.getPhoneNumber());
+        account.setUsername(registrationDto.getUsername());
+        account.setFullName(registrationDto.getFullName());
+        account.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
+        accountRepository.save(account);
+        return new AccountDto(account.getUsername());
     }
 
     @Override

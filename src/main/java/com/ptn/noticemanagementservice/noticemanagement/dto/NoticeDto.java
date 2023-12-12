@@ -9,12 +9,14 @@ import java.util.List;
 @Data
 @EqualsAndHashCode
 public class NoticeDto {
-
+    private Long id;
     private String title;
     private String content;
     private Date registrationDate;
     private Integer numberOfViews;
     private String author;
-    private List<DocumentDto> documentDtos;
+    private Date startDate;
+    private Date endDate;
+    private List<DocumentDto> documents;
 
 }

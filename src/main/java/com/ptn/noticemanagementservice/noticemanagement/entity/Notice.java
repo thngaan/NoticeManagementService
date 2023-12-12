@@ -13,7 +13,7 @@ import java.util.List;
 @Entity(name = "Notice")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Notice  extends BaseEntity {
+public class Notice extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "AuthorId", referencedColumnName = "Id", nullable = false)

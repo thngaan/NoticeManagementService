@@ -8,8 +8,8 @@ import org.springframework.cache.annotation.EnableCaching;
 @EnableCaching
 public class NoticeManagementServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(NoticeManagementServiceApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(NoticeManagementServiceApplication.class, args);
+    }
 
 }

@@ -14,8 +14,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+import static com.ptn.noticemanagementservice.common.contant.RestURI.ID;
+import static com.ptn.noticemanagementservice.common.contant.RestURI.NOTICE_API;
+
 @RestController
-@RequestMapping("/api/notices")
+@RequestMapping(NOTICE_API)
 public class NoticeController {
 
     private NoticeService noticeService;
@@ -24,7 +27,7 @@ public class NoticeController {
         this.noticeService = noticeService;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(ID)
     public ResponseEntity<GenericResponse<NoticeDto>> get(@PathVariable Long id) throws ResourceNotFoundException {
         NoticeDto noticeDto = noticeService.get(id);
 
@@ -37,8 +40,8 @@ public class NoticeController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<GenericResponse<NoticeDto>> create(@Validated @RequestPart NoticeRequest notice,
-                            @RequestPart(required = false) List<MultipartFile> attachments) throws ResourceNotFoundException {
-        NoticeDto noticeDto =  noticeService.createUpdate(notice, attachments);
+                                                             @RequestPart(required = false) List<MultipartFile> attachments) throws ResourceNotFoundException {
+        NoticeDto noticeDto = noticeService.createUpdate(notice, attachments);
 
         GenericResponse<NoticeDto> response = new GenericResponseBuilder<>()
                 .setMessage("Success to create notice")
@@ -47,11 +50,11 @@ public class NoticeController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping(value = "/{id}",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PutMapping(value = ID, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<GenericResponse<NoticeDto>> update(@PathVariable Long id, @Validated @RequestPart NoticeRequest notice,
-                            @RequestPart(required = false) List<MultipartFile> attachments) throws ResourceNotFoundException {
+                                                             @RequestPart(required = false) List<MultipartFile> attachments) throws ResourceNotFoundException {
         notice.setId(id);
-        NoticeDto noticeDto =  noticeService.createUpdate(notice, attachments);
+        NoticeDto noticeDto = noticeService.createUpdate(notice, attachments);
 
         GenericResponse<NoticeDto> response = new GenericResponseBuilder<>()
                 .setMessage(String.format("Success to update notice id = %s", id))
@@ -60,7 +63,7 @@ public class NoticeController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(ID)
     public ResponseEntity<GenericResponse> delete(@PathVariable Long id) throws ResourceNotFoundException {
         noticeService.softDelete(id);
 

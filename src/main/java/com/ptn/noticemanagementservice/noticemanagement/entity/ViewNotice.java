@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 @Entity(name = "ViewNotice")
 @Data
 @EqualsAndHashCode
-public class ViewNotice  extends BaseEntity {
+public class ViewNotice extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "AccountId", referencedColumnName = "Id")

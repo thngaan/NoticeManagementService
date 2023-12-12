@@ -1,7 +1,6 @@
 package com.ptn.noticemanagementservice.noticemanagement.request;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,6 +28,6 @@ public class NoticeRequest {
     private String contentDetail;
 
     @Valid
-    private List<DocumentRequest> documentRequests;
+    private List<DocumentRequest> documents;
 
 }

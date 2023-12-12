@@ -1,29 +1,25 @@
 package com.ptn.noticemanagementservice.common.builder;
+
 import com.ptn.noticemanagementservice.common.dto.ErrorDto;
 import com.ptn.noticemanagementservice.common.response.GenericResponse;
 import lombok.NoArgsConstructor;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Date;
 import java.util.List;
 
 /**
  * Builder for GenericResponse
- *
- * @param <T>
  */
 @NoArgsConstructor
 public class GenericResponseBuilder<T> {
-    private String code;
-    private String mesage;
+    private String message;
     private T data;
     private String exception;
     private List<ErrorDto> errors;
 
-    public GenericResponseBuilder(String code, String message) {
-        this.mesage = code;
-        this.code = message;
+    public GenericResponseBuilder(String message) {
+        this.message = message;
     }
 
     public GenericResponseBuilder setException(String exception) {
@@ -31,13 +27,8 @@ public class GenericResponseBuilder<T> {
         return this;
     }
 
-    public GenericResponseBuilder setCode(String code) {
-        this.code = code;
-        return this;
-    }
-
     public GenericResponseBuilder setMessage(String message) {
-        this.mesage = message;
+        this.message = message;
         return this;
     }
 
@@ -55,8 +46,7 @@ public class GenericResponseBuilder<T> {
         GenericResponse<T> genericResponse = new GenericResponse<>();
         genericResponse.setStatus("FAILED");
         genericResponse.setTimestamp(new Date());
-        genericResponse.setCode(this.code);
-        genericResponse.setMessage(this.mesage);
+        genericResponse.setMessage(this.message);
         if (this.data != null) {
             genericResponse.setData(data);
         }
@@ -71,8 +61,7 @@ public class GenericResponseBuilder<T> {
         GenericResponse<T> genericResponse = new GenericResponse<>();
         genericResponse.setStatus("SUCCESS");
         genericResponse.setTimestamp(new Date());
-        genericResponse.setCode(this.code);
-        genericResponse.setMessage(this.mesage);
+        genericResponse.setMessage(this.message);
         genericResponse.setData(this.data);
         return genericResponse;
     }

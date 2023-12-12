@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @Entity(name = "Document")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Document  extends BaseEntity {
+public class Document extends BaseEntity {
 
     @Column(name = "ContentType")
     private String contentType;
