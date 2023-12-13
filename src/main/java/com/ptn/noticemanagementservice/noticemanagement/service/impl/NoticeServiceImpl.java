@@ -15,6 +15,8 @@ import com.ptn.noticemanagementservice.noticemanagement.service.NoticeService;
 import com.ptn.noticemanagementservice.usermanagement.service.AuthenticationFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,16 +48,21 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public NoticeDto get(Long id) throws ResourceNotFoundException {
-        Notice notice = noticeRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> {
-            LOGGER.error("Notice id {} is deleted", id);
-            return new ResourceNotFoundException(Notice.class, id);
-        });
+        Notice notice = getById(id);
         if (authenticationFacade.isSameAccount(notice.getAccount())) {
             return noticeMapper.toDto(notice);
         } else {
             ValidationUtils.validateActiveTime(notice.getStartDate(), notice.getEndDate());
+//            try {
+//                // test multi thread
+//                Thread.sleep(10000);
+//            } catch (Exception e) {
+//
+//            }
+
             noticeRepository.incrementViewCounter(id);
             Notice updatedNotice = noticeRepository.findByIdAndIsDeletedIsFalse(id).get();
+            LOGGER.info("----------------- {}", updatedNotice.getViewCounter());
             return noticeMapper.toDtoForViewer(updatedNotice);
         }
 
@@ -83,7 +90,7 @@ public class NoticeServiceImpl implements NoticeService {
         if (!CollectionUtils.isEmpty(noticeRequest.getDocuments())) {
             notice.setDocuments(initDocuments(notice, noticeRequest.getDocuments(), attachments));
         }
-        Notice noticeResponse = noticeRepository.save(notice);
+        Notice noticeResponse = save(notice);
         return noticeMapper.toDto(noticeResponse);
     }
 
@@ -128,20 +135,32 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public void softDelete(Long id) throws ResourceNotFoundException, AccessDeniedException {
-        Notice notice = noticeRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> {
-            LOGGER.error("Notice id {} is deleted", id);
-            return new ResourceNotFoundException(Notice.class, id);
-        });
+        Notice notice = getById(id);
 
         if (authenticationFacade.isSameAccount(notice.getAccount())) {
             notice.setDeleted(true);
-            noticeRepository.save(notice);
+            save(notice);
         } else {
             LOGGER.error("Username = {} do not allow to resource id {}", notice.getAccount().getUsername(), id);
             throw new AccessDeniedException(String.format("Username = %s do not allow to resource id %s", notice.getAccount().getUsername(), id));
         }
 
     }
+
+    @Cacheable(value = "notices", key = "#id")
+    public Notice getById(Long id) throws ResourceNotFoundException {
+        return noticeRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> {
+            LOGGER.error("Notice id {} is not found or notice is deleted", id);
+            return new ResourceNotFoundException(Notice.class, id);
+        });
+
+    }
+
+    @CachePut(value = "notices", key = "#result.id")
+    public Notice save(Notice notice) {
+        return noticeRepository.save(notice);
+    }
+
 
     @Override
     public void hardDelete(Long id) {

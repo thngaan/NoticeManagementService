@@ -10,4 +10,5 @@ public class DocumentDto {
     private Long id;
     private String documentName;
     private String documentType;
+    private String order;
 }

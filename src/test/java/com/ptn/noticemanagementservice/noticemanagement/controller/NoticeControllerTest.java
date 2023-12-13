@@ -234,6 +234,50 @@ public class NoticeControllerTest {
                 .andExpect(status().is(403));
     }
 
+    @Test
+    @WithUserDetails("username1")
+    public void order3_shouldUpdateFail_noticeNotExisted() throws Exception {
+        NoticeRequest noticeRequest = new NoticeRequest();
+        noticeRequest.setId(id);
+        noticeRequest.setContentDetail("Hi there 2");
+        noticeRequest.setTitle("New title 2");
+
+        Date currentDate = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(currentDate);
+        c.add(Calendar.DATE, 1);
+
+        noticeRequest.setStartDate(currentDate);
+        noticeRequest.setEndDate(c.getTime());
+
+        DocumentRequest documentRequest1 = new DocumentRequest();
+        documentRequest1.setOrder(1);
+        documentRequest1.setFilename("file3.txt");
+
+        noticeRequest.setDocuments(Arrays.asList(documentRequest1));
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json_string = mapper.writeValueAsString(noticeRequest);
+
+
+        MockMultipartFile firstFile = new MockMultipartFile("attachments", "file3.txt", "text/plain", "File 3".getBytes());
+        MockMultipartFile jsonFile = new MockMultipartFile("notice", "", "application/json", json_string.getBytes());
+
+        MockMultipartHttpServletRequestBuilder builder =
+                MockMvcRequestBuilders.multipart(NOTICE_API + "/" + 20);
+        builder.with(new RequestPostProcessor() {
+            @Override
+            public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+                request.setMethod("PUT");
+                return request;
+            }
+        });
+
+        this.mockMvc.perform(builder
+                        .file(firstFile)
+                        .file(jsonFile))
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
     @WithUserDetails("username2")

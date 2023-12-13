@@ -179,4 +179,13 @@ public class DocumentControllerTest {
                 .andExpect(status().is(400))
                 .andReturn();
     }
+
+    @Test
+    @WithUserDetails("username1")
+    public void order3_shouldGetDocFail_DocumentNotExisted() throws Exception {
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.get(DOCUMENT_API + "/" + 20))
+                .andExpect(status().is(400))
+                .andReturn();
+    }
 }

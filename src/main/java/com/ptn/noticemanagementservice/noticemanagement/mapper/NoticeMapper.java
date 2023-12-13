@@ -16,6 +16,7 @@ public interface NoticeMapper extends RequestResponseMapper<NoticeRequest, Notic
     @Simple
     @Mapping(target = "registrationDate", source = "createdDate")
     @Mapping(target = "numberOfViews", source = "viewCounter")
+    @Mapping(target = "content", source = "contentDetail")
     @Mapping(target = "documents", qualifiedBy = Simple.class)
     NoticeDto toDto(Notice notice);
 
@@ -23,6 +24,7 @@ public interface NoticeMapper extends RequestResponseMapper<NoticeRequest, Notic
     @Mapping(target = "endDate", ignore = true)
     @Mapping(target = "registrationDate", source = "createdDate")
     @Mapping(target = "numberOfViews", source = "viewCounter")
+    @Mapping(target = "content", source = "contentDetail")
     @Mapping(target = "documents", qualifiedBy = Simple.class)
     NoticeDto toDtoForViewer(Notice notice);
 
