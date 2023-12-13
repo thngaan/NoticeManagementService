@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Notice entity
+ */
 @Entity(name = "Notice")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -19,7 +22,7 @@ public class Notice extends BaseEntity {
     @JoinColumn(name = "AuthorId", referencedColumnName = "Id", nullable = false)
     private Account account;
 
-    @OneToMany(mappedBy = "notice", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "notice", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Document> documents = new ArrayList<>();
 
     @Column(name = "StartDate")

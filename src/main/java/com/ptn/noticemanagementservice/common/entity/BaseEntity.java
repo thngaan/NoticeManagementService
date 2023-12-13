@@ -22,7 +22,7 @@ public class BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "Id")
-    private long id;
+    private Long id;
 
     @Column(name = "CreatedDate", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)

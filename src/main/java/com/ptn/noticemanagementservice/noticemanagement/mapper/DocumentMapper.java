@@ -6,7 +6,6 @@ import com.ptn.noticemanagementservice.noticemanagement.entity.Document;
 import com.ptn.noticemanagementservice.noticemanagement.request.DocumentRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
 @Mapper(componentModel = "spring")
@@ -17,9 +16,4 @@ public interface DocumentMapper extends RequestResponseMapper<DocumentRequest, D
     @Mapping(target = "documentType", source = "contentType")
     @Mapping(target = "documentName", source = "fileName")
     DocumentDto toDto(Document document);
-
-    @Simple
-    Document toEntity(DocumentRequest documentRequest);
-
-    void updateEntity(@MappingTarget Document document, DocumentRequest documentRequest);
 }

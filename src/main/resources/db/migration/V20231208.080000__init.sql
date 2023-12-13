@@ -4,7 +4,6 @@ START TRANSACTION;
 CREATE TABLE IF NOT EXISTS `Account`(
 	`Id` BIGINT AUTO_INCREMENT NOT NULL,
 	`Username` VARCHAR(255) NULL,
-	`AccountStatus` VARCHAR(255) NULL,
 	`FullName` VARCHAR(255) NULL,
 	`Password` VARCHAR(255) NULL,
 	`PhoneNumber` VARCHAR(255) NULL,
@@ -48,21 +47,6 @@ CREATE TABLE IF NOT EXISTS `Document`(
     PRIMARY KEY (`Id`),
     KEY `NoticeId` (`NoticeId`),
     CONSTRAINT `FkDocumentNotice` FOREIGN KEY (`NoticeId`) REFERENCES `Notice` (`Id`)
-);
-
-# ViewNotice
-CREATE TABLE IF NOT EXISTS `ViewNotice`(
-	`Id` BIGINT AUTO_INCREMENT NOT NULL,
-	`NoticeId` BIGINT NOT NULL,
-	`AccountId` BIGINT NOT NULL,
-	`Score` INT NOT NULL,
-	`CreatedDate` DATETIME NOT NULL,
-	`UpdatedDate` DATETIME NULL,
-    PRIMARY KEY (Id),
-    KEY `AccountId` (`AccountId`),
-    CONSTRAINT `FkViewViewer` FOREIGN KEY (`AccountId`) REFERENCES `Account` (`Id`),
-    KEY `NoticeId` (`NoticeId`),
-    CONSTRAINT `FkViewNotice` FOREIGN KEY (`NoticeId`) REFERENCES `Notice` (`Id`)
 );
 
 COMMIT;

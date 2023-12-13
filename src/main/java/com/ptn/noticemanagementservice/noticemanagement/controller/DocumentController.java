@@ -16,7 +16,7 @@ import static com.ptn.noticemanagementservice.common.contant.RestURI.ID;
 @RequestMapping(DOCUMENT_API)
 public class DocumentController {
 
-    private DocumentService documentService;
+    private final DocumentService documentService;
 
     public DocumentController(DocumentService documentService) {
         this.documentService = documentService;

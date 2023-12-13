@@ -3,6 +3,7 @@ package com.ptn.noticemanagementservice.usermanagement.entity;
 import com.ptn.noticemanagementservice.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -11,9 +12,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+/**
+ * Account Entity
+ */
 @Entity(name = "Account")
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class Account extends BaseEntity implements UserDetails {
 
     @Column(name = "Username")
@@ -29,11 +33,9 @@ public class Account extends BaseEntity implements UserDetails {
     private String phoneNumber;
 
     @ToString.Exclude
+    @NotNull
     @Column(name = "Password")
     private String password;
-
-    @Column(name = "AccountStatus")
-    private String accountStatus;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

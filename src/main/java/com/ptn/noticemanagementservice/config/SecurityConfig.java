@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static com.ptn.noticemanagementservice.common.contant.RestURI.*;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -25,7 +26,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/login", "/registration").permitAll()
+                        .requestMatchers(API + LOGIN, API + REGISTRATION).permitAll()
                         .anyRequest()
                         .authenticated())
                 .httpBasic(withDefaults())
