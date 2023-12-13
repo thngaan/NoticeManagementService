@@ -1,5 +1,4 @@
 # NoticeManagementService
-This is the project supply the api for PTN's notice.
 
 ## Project Overview
 The NoticeManagementService contain 3 part:
