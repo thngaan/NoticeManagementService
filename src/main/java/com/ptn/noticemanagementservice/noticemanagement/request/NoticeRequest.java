@@ -2,6 +2,7 @@ package com.ptn.noticemanagementservice.noticemanagement.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
@@ -15,8 +16,10 @@ public class NoticeRequest {
 
     private Long id;
 
+    @NotNull
     private Date startDate;
 
+    @NotNull
     private Date endDate;
 
     @NotBlank(message = "Title is required")

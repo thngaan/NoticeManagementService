@@ -5,6 +5,8 @@ import com.ptn.noticemanagementservice.noticemanagement.entity.Document;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 
 public interface DocumentService {
 

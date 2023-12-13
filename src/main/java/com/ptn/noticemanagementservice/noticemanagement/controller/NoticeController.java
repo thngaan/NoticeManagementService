@@ -59,16 +59,25 @@ public class NoticeController {
      */
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<GenericResponse<NoticeDto>> create(@Validated @RequestPart NoticeRequest notice,
-                                                             @RequestPart(required = false) List<MultipartFile> attachments) throws ResourceNotFoundException, AccessDeniedException {
+                                                             @RequestPart(required = false) List<MultipartFile> attachments) throws ResourceNotFoundException {
         if (!CollectionUtils.isEmpty(notice.getDocuments()) && !CollectionUtils.isEmpty(attachments) && (notice.getDocuments().size() < attachments.size())) {
             GenericResponse<NoticeDto> response = new GenericResponseBuilder<>()
-                    .setMessage("Success to create notice")
+                    .setMessage("Failure to create notice")
                     .setErrors(Arrays.asList(new ErrorDto("notice.documents", "size is invalid")))
-                    .buildSuccess();
+                    .buildFailure();
             return ResponseEntity.badRequest().body(response);
         }
 
-        NoticeDto noticeDto = noticeService.createUpdate(notice, attachments);
+        if (notice.getStartDate().after(notice.getEndDate())) {
+            GenericResponse<NoticeDto> response = new GenericResponseBuilder<>()
+                    .setMessage("Failure to create notice")
+                    .setErrors(Arrays.asList(new ErrorDto("notice.startDate", "should before notice.endDate")))
+                    .buildFailure();
+            return ResponseEntity.badRequest().body(response);
+        }
+
+
+        NoticeDto noticeDto = noticeService.create(notice, attachments);
 
         GenericResponse<NoticeDto> response = new GenericResponseBuilder<>()
                 .setMessage("Success to create notice")
@@ -89,8 +98,24 @@ public class NoticeController {
     @PutMapping(value = ID, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<GenericResponse<NoticeDto>> update(@PathVariable Long id, @Validated @RequestPart NoticeRequest notice,
                                                              @RequestPart(required = false) List<MultipartFile> attachments) throws ResourceNotFoundException, AccessDeniedException {
+        if (!CollectionUtils.isEmpty(notice.getDocuments()) && !CollectionUtils.isEmpty(attachments) && (notice.getDocuments().size() < attachments.size())) {
+            GenericResponse<NoticeDto> response = new GenericResponseBuilder<>()
+                    .setMessage("Failure to update notice")
+                    .setErrors(Arrays.asList(new ErrorDto("notice.documents", "size is invalid")))
+                    .buildFailure();
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (notice.getStartDate().after(notice.getEndDate())) {
+            GenericResponse<NoticeDto> response = new GenericResponseBuilder<>()
+                    .setMessage("Failure to update notice")
+                    .setErrors(Arrays.asList(new ErrorDto("notice.startDate", "should before notice.endDate")))
+                    .buildFailure();
+            return ResponseEntity.badRequest().body(response);
+        }
+
         notice.setId(id);
-        NoticeDto noticeDto = noticeService.createUpdate(notice, attachments);
+        NoticeDto noticeDto = noticeService.update(notice, attachments);
 
         GenericResponse<NoticeDto> response = new GenericResponseBuilder<>()
                 .setMessage(String.format("Success to update notice id = %s", id))

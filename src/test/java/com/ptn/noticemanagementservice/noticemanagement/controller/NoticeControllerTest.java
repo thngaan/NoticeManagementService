@@ -56,11 +56,11 @@ public class NoticeControllerTest {
 
         DocumentRequest documentRequest1 = new DocumentRequest();
         documentRequest1.setOrder(1);
-        documentRequest1.setFilename("file1.txt");
+        documentRequest1.setFileName("file1.txt");
 
         DocumentRequest documentRequest2 = new DocumentRequest();
         documentRequest2.setOrder(2);
-        documentRequest2.setFilename("file2.txt");
+        documentRequest2.setFileName("file2.txt");
 
         noticeRequest.setDocuments(Arrays.asList(documentRequest1, documentRequest2));
 
@@ -91,11 +91,11 @@ public class NoticeControllerTest {
 
         DocumentRequest documentRequest1 = new DocumentRequest();
         documentRequest1.setOrder(1);
-        documentRequest1.setFilename("file1.txt");
+        documentRequest1.setFileName("file1.txt");
 
         DocumentRequest documentRequest2 = new DocumentRequest();
         documentRequest2.setOrder(2);
-        documentRequest2.setFilename("file2.txt");
+        documentRequest2.setFileName("file2.txt");
 
         noticeRequest.setDocuments(Arrays.asList(documentRequest1, documentRequest2));
 
@@ -161,7 +161,7 @@ public class NoticeControllerTest {
 
         DocumentRequest documentRequest1 = new DocumentRequest();
         documentRequest1.setOrder(1);
-        documentRequest1.setFilename("file3.txt");
+        documentRequest1.setFileName("file3.txt");
 
         noticeRequest.setDocuments(Arrays.asList(documentRequest1));
 
@@ -216,7 +216,7 @@ public class NoticeControllerTest {
 
         DocumentRequest documentRequest1 = new DocumentRequest();
         documentRequest1.setOrder(1);
-        documentRequest1.setFilename("file3.txt");
+        documentRequest1.setFileName("file3.txt");
 
         noticeRequest.setDocuments(Arrays.asList(documentRequest1));
 
@@ -227,11 +227,20 @@ public class NoticeControllerTest {
         MockMultipartFile firstFile = new MockMultipartFile("attachments", "file3.txt", "text/plain", "File 3".getBytes());
         MockMultipartFile jsonFile = new MockMultipartFile("notice", "", "application/json", json_string.getBytes());
 
-        this.mockMvc
-                .perform(multipart(NOTICE_API)
+        MockMultipartHttpServletRequestBuilder builder =
+                MockMvcRequestBuilders.multipart(NOTICE_API + "/" + id);
+        builder.with(new RequestPostProcessor() {
+            @Override
+            public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+                request.setMethod("PUT");
+                return request;
+            }
+        });
+
+        this.mockMvc.perform(builder
                         .file(firstFile)
                         .file(jsonFile))
-                .andExpect(status().is(403));
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -252,7 +261,7 @@ public class NoticeControllerTest {
 
         DocumentRequest documentRequest1 = new DocumentRequest();
         documentRequest1.setOrder(1);
-        documentRequest1.setFilename("file3.txt");
+        documentRequest1.setFileName("file3.txt");
 
         noticeRequest.setDocuments(Arrays.asList(documentRequest1));
 

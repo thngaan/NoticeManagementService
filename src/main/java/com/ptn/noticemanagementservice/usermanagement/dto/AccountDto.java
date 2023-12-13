@@ -10,8 +10,12 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class AccountDto {
 
+    private Long id;
+
     private String username;
 
+    public AccountDto() {
+    }
 
     public AccountDto(String username) {
         this.username = username;
