@@ -20,13 +20,13 @@ import java.util.Collection;
 @EqualsAndHashCode(callSuper = true)
 public class Account extends BaseEntity implements UserDetails {
 
-    @Column(name = "Username")
+    @Column(name = "Username", unique = true)
     private String username;
 
     @Column(name = "FullName")
     private String fullName;
 
-    @Column(name = "Email")
+    @Column(name = "Email", unique = true)
     private String email;
 
     @Column(name = "PhoneNumber")

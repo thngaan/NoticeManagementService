@@ -12,7 +12,9 @@ public interface NoticeService {
 
     NoticeDto get(Long id) throws ResourceNotFoundException;
 
-    NoticeDto createUpdate(NoticeRequest noticeRequest, List<MultipartFile> attachments) throws ResourceNotFoundException, AccessDeniedException;
+    NoticeDto create(NoticeRequest noticeRequest, List<MultipartFile> attachments) throws ResourceNotFoundException;
+
+    NoticeDto update(NoticeRequest noticeRequest, List<MultipartFile> attachments) throws ResourceNotFoundException, AccessDeniedException;
 
     void softDelete(Long Id) throws ResourceNotFoundException, AccessDeniedException;
 

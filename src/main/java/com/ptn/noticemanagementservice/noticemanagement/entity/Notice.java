@@ -22,7 +22,7 @@ public class Notice extends BaseEntity {
     @JoinColumn(name = "AuthorId", referencedColumnName = "Id", nullable = false)
     private Account account;
 
-    @OneToMany(mappedBy = "notice", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "notice", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Document> documents = new ArrayList<>();
 
     @Column(name = "StartDate")
@@ -33,13 +33,10 @@ public class Notice extends BaseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
 
-    @Column(name = "NoticeStatus")
-    private String noticeStatus;
-
     @Column(name = "Title")
     private String title;
 
-    @Column(name = "ContentDetail")
+    @Column(name = "ContentDetail", columnDefinition = "TEXT")
     private String contentDetail;
 
     @Column(name = "IsDeleted")

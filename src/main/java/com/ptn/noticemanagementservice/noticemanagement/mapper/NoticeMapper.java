@@ -4,12 +4,13 @@ import com.ptn.noticemanagementservice.common.mapper.RequestResponseMapper;
 import com.ptn.noticemanagementservice.noticemanagement.dto.NoticeDto;
 import com.ptn.noticemanagementservice.noticemanagement.entity.Notice;
 import com.ptn.noticemanagementservice.noticemanagement.request.NoticeRequest;
+import com.ptn.noticemanagementservice.usermanagement.mapper.AccountMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring", uses = {DocumentMapper.class})
+@Mapper(componentModel = "spring", uses = {DocumentMapper.class, AccountMapper.class})
 @Component
 public interface NoticeMapper extends RequestResponseMapper<NoticeRequest, Notice, NoticeDto> {
 
@@ -18,6 +19,7 @@ public interface NoticeMapper extends RequestResponseMapper<NoticeRequest, Notic
     @Mapping(target = "numberOfViews", source = "viewCounter")
     @Mapping(target = "content", source = "contentDetail")
     @Mapping(target = "documents", qualifiedBy = Simple.class)
+    @Mapping(target = "account", qualifiedBy = Simple.class)
     NoticeDto toDto(Notice notice);
 
     @Mapping(target = "startDate", ignore = true)
@@ -26,6 +28,7 @@ public interface NoticeMapper extends RequestResponseMapper<NoticeRequest, Notic
     @Mapping(target = "numberOfViews", source = "viewCounter")
     @Mapping(target = "content", source = "contentDetail")
     @Mapping(target = "documents", qualifiedBy = Simple.class)
+    @Mapping(target = "account", qualifiedBy = Simple.class)
     NoticeDto toDtoForViewer(Notice notice);
 
     @Simple

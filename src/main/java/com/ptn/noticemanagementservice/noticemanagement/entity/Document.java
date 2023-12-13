@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Arrays;
+
 @Entity(name = "Document")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -30,4 +32,16 @@ public class Document extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "NoticeId")
     private Notice notice;
+
+    @Override
+    public String toString() {
+        return "Document{" +
+                "contentType='" + contentType + '\'' +
+                ", fileSize=" + fileSize +
+                ", fileName='" + fileName + '\'' +
+                ", fileContent=" + Arrays.toString(fileContent) +
+                ", order=" + order +
+                ", noticeId=" + (notice == null ? null : notice.getId()) +
+                '}';
+    }
 }

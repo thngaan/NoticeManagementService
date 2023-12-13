@@ -15,10 +15,10 @@ import com.ptn.noticemanagementservice.noticemanagement.service.NoticeService;
 import com.ptn.noticemanagementservice.usermanagement.service.AuthenticationFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -48,98 +48,123 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public NoticeDto get(Long id) throws ResourceNotFoundException {
-        Notice notice = getById(id);
+        Notice notice = noticeRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> {
+            LOGGER.error("Notice id {} is not found or notice is deleted", id);
+            return new ResourceNotFoundException(Notice.class, id);
+        });
+
+        // if author, return full data
         if (authenticationFacade.isSameAccount(notice.getAccount())) {
             return noticeMapper.toDto(notice);
-        } else {
+        } else { // if viewer, check notice active, ++ viewCounter and return view content only
             ValidationUtils.validateActiveTime(notice.getStartDate(), notice.getEndDate());
-//            try {
-//                // test multi thread
-//                Thread.sleep(10000);
-//            } catch (Exception e) {
-//
-//            }
 
             noticeRepository.incrementViewCounter(id);
             Notice updatedNotice = noticeRepository.findByIdAndIsDeletedIsFalse(id).get();
             LOGGER.info("----------------- {}", updatedNotice.getViewCounter());
             return noticeMapper.toDtoForViewer(updatedNotice);
         }
-
     }
 
+    @Transactional
     @Override
-    public NoticeDto createUpdate(NoticeRequest noticeRequest, List<MultipartFile> attachments) throws ResourceNotFoundException, AccessDeniedException {
-        Notice notice;
-        Long noticeId = noticeRequest.getId();
-        if (noticeId == null) {
-            notice = noticeMapper.toEntity(noticeRequest);
-            notice.setAccount(authenticationFacade.getAuthenticationAccount());
-        } else {
-            notice = noticeRepository.findByIdAndIsDeletedIsFalse(noticeId).orElseThrow(() -> {
-                LOGGER.error("Notice id {} is deleted", noticeId);
-                return new ResourceNotFoundException(Notice.class, noticeId);
-            });
-            if (authenticationFacade.isSameAccount(notice.getAccount())) {
-                noticeMapper.updateEntity(notice, noticeRequest);
-            } else {
-                LOGGER.error("Username = {} do not allow to resource id {}", notice.getAccount().getUsername(), noticeId);
-                throw new AccessDeniedException(String.format("Username = %s do not allow to resource id %s", notice.getAccount().getUsername(), noticeId));
-            }
-        }
+    public NoticeDto create(NoticeRequest noticeRequest, List<MultipartFile> attachments) throws ResourceNotFoundException {
+        Notice notice = noticeMapper.toEntity(noticeRequest);
+        notice.setAccount(authenticationFacade.getAuthenticationAccount());
+
         if (!CollectionUtils.isEmpty(noticeRequest.getDocuments())) {
-            notice.setDocuments(initDocuments(notice, noticeRequest.getDocuments(), attachments));
+            List<Document> documents = new ArrayList<>();
+            Map<String, MultipartFile> map = attachments.stream()
+                    .collect(Collectors.toMap(MultipartFile::getOriginalFilename, Function.identity()));
+            for (DocumentRequest documentRequest : noticeRequest.getDocuments()) {
+                Document document = getDocument(notice, map, documentRequest);
+                documents.add(document);
+            }
+            notice.setDocuments(documents);
         }
-        Notice noticeResponse = save(notice);
+        Notice noticeResponse = noticeRepository.save(notice);
         return noticeMapper.toDto(noticeResponse);
     }
 
-    private List<Document> initDocuments(Notice notice, List<DocumentRequest> documentRequests, List<MultipartFile> attachments) throws ResourceNotFoundException {
-        Map<String, MultipartFile> map = attachments.stream()
-                .collect(Collectors.toMap(MultipartFile::getOriginalFilename, Function.identity()));
+    @Transactional
+    @Override
+    public NoticeDto update(NoticeRequest noticeRequest, List<MultipartFile> attachments) throws ResourceNotFoundException, AccessDeniedException {
 
-        List<Document> documents = new ArrayList<>();
-        for (DocumentRequest documentRequest : documentRequests) {
-            Document document;
-            MultipartFile file = map.get(documentRequest.getFilename());
-            if (notice.getId() == null || documentRequest.getId() == null) {
-                document = new Document();
-                if (file == null) {
-                    LOGGER.error("File {} is not existed in attachments.", documentRequest.getFilename());
-                    throw new NoticeException(String.format("File %s is not existed in attachments.", documentRequest.getFilename()));
-                }
-            } else {
-                document = documentService.findById(documentRequest.getId());
-            }
+        Long noticeId = noticeRequest.getId();
+        Notice notice = noticeRepository.findByIdAndIsDeletedIsFalse(noticeId).orElseThrow(() -> {
+            LOGGER.error("Notice id {} is deleted", noticeId);
+            return new ResourceNotFoundException(Notice.class, noticeId);
+        });
 
-            if (file != null) {
-                document.setContentType(file.getContentType());
-                document.setFileSize(file.getSize());
-                String fileName = file.getOriginalFilename().replaceAll("[\\\\/:*?\"<>|]", "_");
-                document.setFileName(fileName);
-                try {
-                    document.setFileContent(file.getBytes());
-                } catch (IOException e) {
-                    LOGGER.error("Exception when set file content. message = {}", e.getMessage());
-                    throw new NoticeException("Exception when set file content.", e);
-                }
-            }
-
-            document.setNotice(notice);
-            document.setOrder(documentRequest.getOrder());
-
-            documents.add(document);
+        if (authenticationFacade.isSameAccount(notice.getAccount())) {
+            noticeMapper.updateEntity(notice, noticeRequest);
+        } else {
+            LOGGER.error("Username = {} do not allow to resource id {}", notice.getAccount().getUsername(), noticeId);
+            throw new AccessDeniedException(String.format("Username = %s do not allow to resource id %s", notice.getAccount().getUsername(), noticeId));
         }
-        return documents;
+
+        if (!CollectionUtils.isEmpty(noticeRequest.getDocuments())) {
+            List<Document> documents = new ArrayList<>();
+            Map<String, MultipartFile> map = attachments.stream()
+                    .collect(Collectors.toMap(MultipartFile::getOriginalFilename, Function.identity()));
+            // update document to existed.
+            Map<Long, DocumentRequest> keepDoc = noticeRequest.getDocuments().stream().collect(Collectors.toMap(DocumentRequest::getId, Function.identity()));
+
+            for (Document document : notice.getDocuments()) {
+                if (keepDoc.containsKey(document.getId())) {
+                    document.setOrder(keepDoc.get(document.getId()).getOrder());
+                    documents.add(document);
+                }
+            }
+
+            List<DocumentRequest> newDoc = noticeRequest.getDocuments().stream()
+                    .filter(item -> item.getId() == null)
+                    .collect(Collectors.toList());
+
+            for (DocumentRequest documentRequest : newDoc) {
+                Document document = getDocument(notice, map, documentRequest);
+                documents.add(document);
+            }
+            notice.getDocuments().clear();
+            notice.getDocuments().addAll(documents);
+        }
+
+        return noticeMapper.toDto(noticeRepository.saveAndFlush(notice));
     }
 
+    private Document getDocument(Notice notice, Map<String, MultipartFile> map, DocumentRequest documentRequest) {
+        Document document = new Document();
+        MultipartFile file = map.get(documentRequest.getFileName());
+
+        if (file != null) {
+            document.setContentType(file.getContentType());
+            document.setFileSize(file.getSize());
+            String fileName = documentRequest.getFileName().replaceAll("[\\\\/:*?\"<>|]", "_");
+            document.setFileName(fileName);
+            try {
+                document.setFileContent(file.getBytes());
+            } catch (IOException e) {
+                LOGGER.error("Exception when set file content. message = {}", e.getMessage());
+                throw new NoticeException("Exception when set file content.", e);
+            }
+        }
+
+        document.setNotice(notice);
+        document.setOrder(documentRequest.getOrder());
+        return document;
+    }
+
+    @Transactional
     @Override
     public void softDelete(Long id) throws ResourceNotFoundException, AccessDeniedException {
-        Notice notice = getById(id);
+        Notice notice = noticeRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> {
+            LOGGER.error("Notice id {} is not found or notice is deleted", id);
+            return new ResourceNotFoundException(Notice.class, id);
+        });
 
         if (authenticationFacade.isSameAccount(notice.getAccount())) {
             notice.setDeleted(true);
-            save(notice);
+            noticeRepository.save(notice);
         } else {
             LOGGER.error("Username = {} do not allow to resource id {}", notice.getAccount().getUsername(), id);
             throw new AccessDeniedException(String.format("Username = %s do not allow to resource id %s", notice.getAccount().getUsername(), id));
@@ -147,21 +172,7 @@ public class NoticeServiceImpl implements NoticeService {
 
     }
 
-    @Cacheable(value = "notices", key = "#id")
-    public Notice getById(Long id) throws ResourceNotFoundException {
-        return noticeRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> {
-            LOGGER.error("Notice id {} is not found or notice is deleted", id);
-            return new ResourceNotFoundException(Notice.class, id);
-        });
-
-    }
-
-    @CachePut(value = "notices", key = "#result.id")
-    public Notice save(Notice notice) {
-        return noticeRepository.save(notice);
-    }
-
-
+    @Transactional
     @Override
     public void hardDelete(Long id) {
         noticeRepository.deleteById(id);

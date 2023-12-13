@@ -61,11 +61,11 @@ public class DocumentControllerTest {
 
         DocumentRequest documentRequest1 = new DocumentRequest();
         documentRequest1.setOrder(1);
-        documentRequest1.setFilename("file1.txt");
+        documentRequest1.setFileName("file1.txt");
 
         DocumentRequest documentRequest2 = new DocumentRequest();
         documentRequest2.setOrder(2);
-        documentRequest2.setFilename("file2.txt");
+        documentRequest2.setFileName("file2.txt");
 
         noticeRequest.setDocuments(Arrays.asList(documentRequest1, documentRequest2));
 
@@ -109,11 +109,11 @@ public class DocumentControllerTest {
 
         DocumentRequest documentRequest1 = new DocumentRequest();
         documentRequest1.setOrder(1);
-        documentRequest1.setFilename("file1.txt");
+        documentRequest1.setFileName("file1.txt");
 
         DocumentRequest documentRequest2 = new DocumentRequest();
         documentRequest2.setOrder(2);
-        documentRequest2.setFilename("file2.txt");
+        documentRequest2.setFileName("file2.txt");
 
         noticeRequest.setDocuments(Arrays.asList(documentRequest1, documentRequest2));
 

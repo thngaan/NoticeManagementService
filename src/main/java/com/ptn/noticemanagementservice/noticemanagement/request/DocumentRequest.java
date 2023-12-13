@@ -13,7 +13,7 @@ public class DocumentRequest {
 
     @NotBlank(message = "Filename is required")
     @Length(max = 50)
-    private String filename;
+    private String fileName;
 
     private Integer order;
 }
